@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>年底客製化訂單與樣品交期整合計畫 - 數位簡報</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Playfair+Display:ital,wght@0,600;0,800;1,600&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            berry: {
+              DEFAULT: '#B03060',
+              50: '#FDF2F5',
+              100: '#FBE5EC',
+              600: '#91244C',
+              700: '#731A3B',
+              800: '#56102B',
+              900: '#38061A'
+            },
+            gold: {
+              DEFAULT: '#C9A227',
+              light: '#E2C258',
+              dark: '#997813',
+              glow: '#FFF8DE'
+            },
+            mist: {
+              DEFAULT: '#F7F4F2',
+              card: '#FFFFFF',
+              dark: '#ECE7E3',
+              border: '#E2DAD5'
+            },
+            charcoal: {
+              DEFAULT: '#2B2627',
+              muted: '#635B5E',
+              light: '#8C8285'
+            }
+          },
+          fontFamily: {
+            sans: ['"Noto Sans TC"', 'sans-serif'],
+            serif: ['"Playfair Display"', 'serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #1c1819;
+      color: #2B2627;
+      font-family: 'Noto Sans TC', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* 16:9 Presentation Frame Container */
+    .slide-viewport {
+      width: 100%;
+      max-width: 1280px;
+      aspect-ratio: 16 / 9;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+    }
+
+    /* Active Slide Toggle Visibility */
+    .slide-page {
+      display: none;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 0.35s ease-in-out;
+    }
+
+    .slide-page.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    /* Custom Scrollbar for inner sidebar navigation */
+    .nav-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .nav-scrollbar::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .nav-scrollbar::-webkit-scrollbar-thumb {
+      background: #B03060;
+      border-radius: 4px;
+    }
+
+    /* Active State styling for Left Navigation */
+    .nav-item.active {
+      background-color: #B03060;
+      color: #FFFFFF !important;
+      border-left: 4px solid #C9A227;
+      font-weight: 700;
+    }
+
+    .nav-item.active span.nav-num {
+      color: #C9A227;
+    }
+
+    /* Glassmorphism Cards */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(226, 218, 213, 0.8);
+    }
+
+    /* Gold Gradient Highlight */
+    .gold-gradient-text {
+      background: linear-gradient(135deg, #B03060 0%, #C9A227 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-2 sm:p-4 md:p-6 select-none">
+
+  <!-- Main Presentation Container Window -->
+  <div class="slide-viewport relative flex bg-mist rounded-2xl overflow-hidden border border-berry-900/30">
+
+    <!-- LEFT NAVIGATION SIDEBAR -->
+    <aside class="w-64 sm:w-72 bg-charcoal text-mist flex flex-col flex-shrink-0 z-20 border-r border-charcoal-muted/30">
+      <!-- Header / Logo -->
+      <div class="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-berry"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-gold"></span>
+            <span class="text-xs font-semibold tracking-wider text-gold uppercase">2026 營運戰情專案</span>
+          </div>
+          <h1 class="text-sm font-bold text-white mt-1 tracking-wide">年底客製交期整合計畫</h1>
+        </div>
+        <i class="fa-solid fa-briefcase text-berry text-xl"></i>
+      </div>
+
+      <!-- Slide Navigation Button List -->
+      <nav class="flex-1 overflow-y-auto nav-scrollbar p-3 space-y-1.5" id="nav-list">
+        <!-- Javascript renders active states here -->
+      </nav>
+
+      <!-- Sidebar Footer / Controls -->
+      <div class="p-4 border-t border-white/10 bg-black/20 flex items-center justify-between text-xs text-mist/70">
+        <span id="slide-indicator">1 / 10</span>
+        <div class="flex items-center space-x-2">
+          <button id="prev-btn" onclick="prevSlide()" class="p-2 rounded-lg bg-white/5 hover:bg-berry hover:text-white transition cursor-pointer" title="上一頁 (←)">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <button id="next-btn" onclick="nextSlide()" class="p-2 rounded-lg bg-white/5 hover:bg-berry hover:text-white transition cursor-pointer" title="下一頁 (→)">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN SLIDE DISPLAY AREA -->
+    <main class="flex-1 relative overflow-hidden bg-mist flex flex-col justify-between">
+
+      <!-- SLIDE 1: Cover Page -->
+      <div class="slide-page active p-8 md:p-12 flex-col justify-between bg-gradient-to-br from-[#230813] via-[#38061A] to-[#1a1215] text-white" id="slide-1">
+        <div class="flex items-center justify-between">
+          <span class="px-3 py-1 rounded-full bg-gold/20 border border-gold/40 text-gold font-medium text-xs tracking-wider">
+            高層簡報專用 ‧ 總經理與各部門主管
+          </span>
+          <span class="text-xs text-mist/60"><i class="fa-regular fa-clock mr-1"></i>簡報時間：10 分鐘</span>
+        </div>
+
+        <div class="my-auto max-w-3xl space-y-6">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-berry/40 text-mist text-sm border-l-4 border-gold">
+            <i class="fa-solid fa-bullseye text-gold"></i>
+            <span>2026 年底營運衝刺戰情專案</span>
+          </div>
+          <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight text-white tracking-tight">
+            年底客製化訂單與<br>
+            <span class="text-gold">樣品交期整合計畫</span>
+          </h1>
+          <p class="text-mist/80 text-base md:text-lg leading-relaxed font-light border-l-2 border-white/20 pl-4">
+            透過制度化分級管理、量化插單評估與跨部門戰情會報，確保年底關鍵訂單與樣品 <strong class="text-gold font-bold">100% 準時交付</strong>。
+          </p>
+        </div>
+
+        <div class="pt-6 border-t border-white/10 flex items-center justify-between text-xs text-mist/60">
+          <div>報告單位：營運企劃與專案戰情室</div>
+          <div>報告日期：2026 Q4</div>
+        </div>
+      </div>
+
+      <!-- SLIDE 2: Current Challenges -->
+      <div class="slide-page p-8 md:p-12 flex-col justify-between" id="slide-2">
+        <!-- Header -->
+        <div class="flex items-center justify-between border-b border-mist-border pb-4">
+          <div>
+            <span class="text-xs font-bold text-berry uppercase tracking-wider">Current Challenges</span>
+            <h2 class="text-2xl md:text-3xl font-extrabold text-charcoal flex items-center gap-3">
+              <i class="fa-solid fa-triangle-exclamation text-berry"></i>
+              年底旺季的三大營運痛點
+            </h2>
+          </div>
+          <span class="text-xs text-charcoal-muted">現況與挑戰分析</span>
+        </div>
+
+        <!-- Bento Grid Layout -->
+        <div class="grid grid-cols-3 gap-6 my-auto">
+          <!-- Bento Box 1 -->
+          <div class="glass-card rounded-2xl p-6 flex flex-col justify-between border-t-4 border-berry shadow-sm hover:shadow-md transition">
+            <div class="space-y-3">
+              <div class="w-12 h-12 rounded-xl bg-berry/10 flex items-center justify-center text-berry font-bold text-xl">
+                <i class="fa-solid fa-industry"></i>
+              </div>
+              <h3 class="text-lg font-bold text-charcoal">1. 樣品與量產搶線</h3>
+              <p class="text-sm text-charcoal-muted leading-relaxed">
+                年底量產高峰期，樣品房與正式生產線產能嚴重打擠，缺乏客觀優先排程調度機制。
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-mist-border text-xs text-berry font-medium flex items-center gap-1">
+              <i class="fa-solid fa-arrow-right"></i> 導致打樣延誤衝刺季
+            </div>
+          </div>
+
+          <!-- Bento Box 2 -->
+          <div class="glass-card rounded-2xl p-6 flex flex-col justify-between border-t-4 border-gold shadow-sm hover:shadow-md transition">
+            <div class="space-y-3">
+              <div class="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center text-gold-dark font-bold text-xl">
+                <i class="fa-solid fa-boxes-packing"></i>
+              </div>
+              <h3 class="text-lg font-bold text-charcoal">2. 客製物料交期失控</h3>
+              <p class="text-sm text-charcoal-muted leading-relaxed">
+                長交期客製化包材與專用零件未提前鎖定備料，到位不及直接衝擊終端交付滿意度。
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-mist-border text-xs text-gold-dark font-medium flex items-center gap-1">
+              <i class="fa-solid fa-arrow-right"></i> 缺料停工風險劇增
+            </div>
+          </div>
+
+          <!-- Bento Box 3 -->
+          <div class="glass-card rounded-2xl p-6 flex flex-col justify-between border-t-4 border-charcoal shadow-sm hover:shadow-md transition">
+            <div class="space-y-3">
+              <div class="w-12 h-12 rounded-xl bg-charcoal/10 flex items-center justify-center text-charcoal font-bold text-xl">
+                <i class="fa-solid fa-comments-dollar"></i>
+              </div>
+              <h3 class="text-lg font-bold text-charcoal">3. 跨部門人情插單</h3>
+              <p class="text-sm text-charcoal-muted leading-relaxed">
+                溝通多依賴人工與人情調度，缺乏客觀量化權重矩陣，造成內部部門高度耗損。
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-mist-border text-xs text-charcoal-muted font-medium flex items-center gap-1">
+              <i class="fa-solid fa-arrow-right"></i> 內部跨部門溝通摩擦高
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-xs text-charcoal-light flex justify-between items-center border-t border-mist-border pt-3">
+          <span>年底客製化訂單與樣品交期整合計畫</span>
+          <span>Slide 02</span>
+        </div>
+      </div>
+
+      <!-- SLIDE 3: Key Objectives (KPI Card layout as requested) -->
+      <div class="slide-page p-8 md:p-12 flex-col justify-between" id="slide-3">
+        <!-- Header -->
+        <div class="flex items-center justify-between border-b border-mist-border pb-4">
+          <div>
+            <span class="text-xs font-bold text-gold-dark uppercase tracking-wider">Key Objectives & KPIs</span>
+            <h2 class="text-2xl md:text-3xl font-extrabold text-charcoal flex items-center gap-3">
+              <i class="fa-solid fa-chart-line text-gold"></i>
+              專案三大核心預期目標
+            </h2>
+          </div>
+          <span class="text-xs text-charcoal-muted">數位數字卡片版型</span>
+        </div>
+
+        <!-- KPI Stat Cards Container -->
+        <div class="grid grid-cols-3 gap-6 my-auto">
+          <!-- KPI Card 1 -->
+          <div class="bg-gradient-to-br from-white to-mist-dark rounded-2xl p-8 border border-mist-border shadow-md relative overflow-hidden flex flex-col justify-between">
+            <div class="absolute -right-4 -bottom-4 w-28 h-28 bg-berry/5 rounded-full blur-xl"></div>
+            <div>
+              <span class="text-xs font-bold text-berry tracking-wider uppercase">Lead Time Target</span>
+              <div class="text-4xl md:text-5xl font-black text-berry my-3 tracking-tight">
+                20-30<span class="text-2xl font-bold">%</span>
+              </div>
+              <h3 class="text-base font-bold text-charcoal mb-2">縮短整體交付週期</h3>
+              <p class="text-xs text-charcoal-muted leading-relaxed">
+                優化審查與關鍵路徑（Critical Path），顯著降低客製樣品評估至交付時間。
+              </p>
+            </div>
+            <div class="mt-6 flex items-center text-xs font-semibold text-berry bg-berry-50 p-2.5 rounded-lg border border-berry-100">
+              <i class="fa-solid fa-circle-check mr-2"></i> 審查評估與打樣排程最佳化
+            </div>
+          </div>
+
+          <!-- KPI Card 2 -->
+          <div class="bg-gradient-to-br from-white to-mist-dark rounded-2xl p-8 border border-mist-border shadow-md relative overflow-hidden flex flex-col justify-between">
+            <div class="absolute -right-4 -bottom-4 w-28 h-28 bg-gold/10 rounded-full blur-xl"></div>
+            <div>
+              <span class="text-xs font-bold text-gold-dark tracking-wider uppercase">Standardization KPI</span>
+              <div class="text-4xl md:text-5xl font-black text-gold-dark my-3 tracking-tight">
+                100<span class="text-2xl font-bold">%</span>
+              </div>
+              <h3 class="text-base font-bold text-charcoal mb-2">插單標準客觀量化</h3>
+              <p class="text-xs text-charcoal-muted leading-relaxed">
+                全面導入「客製插單評估矩陣」，以商業效益與技術可行性摒除人情拉扯。
+              </p>
+            </div>
+            <div class="mt-6 flex items-center text-xs font-semibold text-gold-dark bg-gold-glow p-2.5 rounded-lg border border-gold-light/40">
+              <i class="fa-solid fa-circle-check mr-2"></i> 制度化評估表發行與實施
+            </div>
+          </div>
+
+          <!-- KPI Card 3 -->
+          <div class="bg-gradient-to-br from-white to-mist-dark rounded-2xl p-8 border border-mist-border shadow-md relative overflow-hidden flex flex-col justify-between">
+            <div class="absolute -right-4 -bottom-4 w-28 h-28 bg-charcoal/5 rounded-full blur-xl"></div>
+            <div>
+              <span class="text-xs font-bold text-charcoal-muted tracking-wider uppercase">Risk Control KPI</span>
+              <div class="text-3xl md:text-4xl font-black text-charcoal my-3 tracking-tight">
+                三色燈號
+              </div>
+              <h3 class="text-base font-bold text-charcoal mb-2">長交期物料預警管控</h3>
+              <p class="text-xs text-charcoal-muted leading-relaxed">
+                建立雙週動態預警機制與關鍵料件鎖定，阻斷缺料風險於生產排程前。
+              </p>
+            </div>
+            <div class="mt-6 flex items-center text-xs font-semibold text-charcoal bg-mist-dark p-2.5 rounded-lg border border-mist-border">
+              <i class="fa-solid fa-circle-check mr-2"></i> 物料追蹤動態看板上線
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-xs text-charcoal-light flex justify-between items-center border-t border-mist-border pt-3">
+          <span>年底客製化訂單與樣品交期整合計畫</span>
+          <span>Slide 03</span>
+        </div>
+      </div>
+
+      <!-- SLIDE 4: Gatekeeper System -->
+      <div class="slide-page p-8 md:p-12 flex-col justify-between" id="slide-4">
+        <!-- Header -->
+        <div class="flex items-center justify-between border-b border-mist-border pb-4">
+          <div>
+            <span class="text-xs font-bold text-berry uppercase tracking-wider">Gatekeeper System</span>
+            <h2 class="text-2xl md:text-3xl font-extrabold text-charcoal flex items-center gap-3">
+              <i class="fa-solid fa-filter text-berry"></i>
+              客製化訂單與樣品三級過濾機制
+            </h2>
+          </div>
+          <span class="text-xs text-charcoal-muted">分級審查 SOP</span>
+        </div>
+
+        <!-- 3 Level Cards -->
+        <div class="grid grid-cols-3 gap-6 my-auto">
+          <!-- Class A -->
+          <div class="glass-card rounded-2xl p-6 border flex flex-col justify-between hover:border-emerald-500 transition shadow-sm">
+            <div class="space-y-3">
+              <span class="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">
+                快速通關通道
+              </span>
+              <h3 class="text-xl font-bold text-charcoal">Class A 標準客製</h3>
+              <p class="text-xs text-charcoal-muted">
+                僅變更顏色、印刷 Logo 或標準外包裝印刷變更。
+              </p>
+            </div>
+            <div class="mt-6 bg-mist-dark/60 p-4 rounded-xl border border-mist-border text-xs space-y-2">
+              <div class="font-bold text-charcoal border-b border-mist-border pb-1">審核與排程權責：</div>
+              <p class="text-charcoal-muted">業務直發 <i class="fa-solid fa-arrow-right text-berry mx-1"></i> 資材確認料件 <i class="fa-solid fa-arrow-right text-berry mx-1"></i> 直接進入標準生產排程</p>
+            </div>
+          </div>
+
+          <!-- Class B -->
+          <div class="glass-card rounded-2xl p-6 border flex flex-col justify-between hover:border-gold transition shadow-sm">
+            <div class="space-y-3">
+              <span class="inline-block px-3 py-1 bg-gold-glow text-gold-dark border border-gold-light/30 text-xs font-bold rounded-full">
+                標準技術審查
+              </span>
+              <h3 class="text-xl font-bold text-charcoal">Class B 局部客製</h3>
+              <p class="text-xs text-charcoal-muted">
+                結構微調、模具局部修改或指定特殊零件與輔料。
+              </p>
+            </div>
+            <div class="mt-6 bg-mist-dark/60 p-4 rounded-xl border border-mist-border text-xs space-y-2">
+              <div class="font-bold text-charcoal border-b border-mist-border pb-1">審核與排程權責：</div>
+              <p class="text-charcoal-muted">研發 / 樣品房技術評估 <i class="fa-solid fa-arrow-right text-gold mx-1"></i> 生管綜合評估產線容量排程</p>
+            </div>
+          </div>
+
+          <!-- Class C -->
+          <div class="glass-card rounded-2xl p-6 border flex flex-col justify-between hover:border-berry transition shadow-sm">
+            <div class="space-y-3">
+              <span class="inline-block px-3 py-1 bg-berry-100 text-berry-800 text-xs font-bold rounded-full">
+                高層戰情會審核
+              </span>
+              <h3 class="text-xl font-bold text-charcoal">Class C 深度客製/插單</h3>
+              <p class="text-xs text-charcoal-muted">
+                新開模具、全新結構設計或旺季產線緊急插單。
+              </p>
+            </div>
+            <div class="mt-6 bg-mist-dark/60 p-4 rounded-xl border border-mist-border text-xs space-y-2">
+              <div class="font-bold text-charcoal border-b border-mist-border pb-1">審核與排程權責：</div>
+              <p class="text-charcoal-muted">提報「跨部門戰情會」 <i class="fa-solid fa-arrow-right text-berry mx-1"></i> 以量化計分矩陣決策排序</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-xs text-charcoal-light flex justify-between items-center border-t border-mist-border pt-3">
+          <span>年底客製化訂單與樣品交期整合計畫</span>
+          <span>Slide 04</span>
+        </div>
+      </div>
+
+      <!-- SLIDE 5: Priority Matrix -->
+      <div class="slide-page p-8 md:p-12 flex-col justify-between" id="slide-5">
+        <!-- Header -->
+        <div class="flex items-center justify-between border-b border-mist-border pb-4">
+          <div>
+            <span class="text-xs font-bold text-gold-dark uppercase tracking-wider">Priority Scoring Matrix</span>
+            <h2 class="text-2xl md:text-3xl font-extrabold text-charcoal flex items-center gap-3">
+              <i class="fa-solid fa-calculator text-gold"></i>
+              有限資源下的插單與排序權重
+            </h2>
+          </div>
+          <span class="text-xs text-charcoal-muted">量化評估機制</span>
+        </div>
+
+        <!-- Weight Distribution Grid -->
+        <div class="grid grid-cols-3 gap-6 my-auto">
+          <div class="glass-card rounded-2xl p-6 border-l-8 border-berry flex flex-col justify-between">
+            <div>
+              <div class="text-4xl font-black text-berry mb-2">40<span class="text-2xl">%</span></div>
+              <h3 class="text-base font-bold text-charcoal mb-2"><i class="fa-solid fa-chart-pie text-berry mr-2"></i>商業價值與效益</h3>
+              <p class="text-xs text-charcoal-muted leading-relaxed">
+                評估該項目於年底前轉為高金額正式量產單之可能性、客戶重要性等級及整體訂單金額貢獻度。
+              </p>
+            </div>
+            <span class="mt-4 text-[11px] font-semibold text-berry bg-berry-50 px-2.5 py-1 rounded w-fit">
+              商業價值優先導向
+            </span>
+          </div>
+
+          <div class="glass-card rounded-2xl p-6 border-l-8 border-gold flex flex-col justify-between">
+            <div>
+              <div class="text-4xl font-black text-gold-dark mb-2">30<span class="text-2xl">%</span></div>
+              <h3 class="text-base font-bold text-charcoal mb-2"><i class="fa-solid fa-box-open text-gold-dark mr-2"></i>物料到位率狀況</h3>
+              <p class="text-xs text-charcoal-muted leading-relaxed">
+                確認客製化關鍵零件、專用包材與輔料是否已 100% 到位，堅決避免料件未齊盲目上線排產。
+              </p>
+            </div>
+            <span class="mt-4 text-[11px] font-semibold text-gold-dark bg-gold-glow px-2.5 py-1 rounded w-fit">
+              阻斷空等停工風險
+            </span>
+          </div>
+
+          <div class="glass-card rounded-2xl p-6 border-l-8 border-charcoal flex flex-col justify-between">
+            <div>
+              <div class="text-4xl font-black text-charcoal mb-2">30<span class="text-2xl">%</span></div>
+              <h3 class="text-base font-bold text-charcoal mb-2"><i class="fa-solid fa-gears text-charcoal mr-2"></i>技術可行性與風險</h3>
+              <p class="text-xs text-charcoal-muted leading-relaxed">
+                評估現有模具、設備機台能力、工藝複雜度，以及是否有可替代之快速打樣快速解決方案。
+              </p>
+            </div>
+            <span class="mt-4 text-[11px] font-semibold text-charcoal bg-mist-dark px-2.5 py-1 rounded w-fit">
+              技術成功率評估
+            </span>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-xs text-charcoal-light flex justify-between items-center border-t border-mist-border pt-3">
+          <span>年底客製化訂單與樣品交期整合計畫</span>
+          <span>Slide 05</span>
+        </div>
+      </div>
+
+      <!-- SLIDE 6: War Room Operations -->
+      <div class="slide-page p-8 md:p-12 flex-col justify-between" id="slide-6">
+        <!-- Header -->
+        <div class="flex items-center justify-between border-b border-mist-border pb-4">
+          <div>
+            <span class="text-xs font-bold text-berry uppercase tracking-wider">War Room Operations</span>
+            <h2 class="text-2xl md:text-3xl font-extrabold text-charcoal flex items-center gap-3">
+              <i class="fa-solid fa-people-roof text-berry"></i>
+              年底交期戰情小組 (War Room)
+            </h2>
+          </div>
+          <span class="text-xs text-charcoal-muted">跨部門溝通機制</span>
+        </div>
+
+        <div class="grid grid-cols-12 gap-6 my-auto">
+          <!-- Left dark block: Composition -->
+          <div class="col-span-5 bg-charcoal text-mist rounded-2xl p-6 flex flex-col justify-between">
+            <div>
+              <h3 class="text-lg font-bold text-gold flex items-center gap-2 mb-4">
+                <i class="fa-solid fa-user-shield"></i> 戰情核心成員
+              </h3>
+              <ul class="space-y-3 text-xs text-mist/90">
+                <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-berry"></i> <strong>業務部：</strong> 收集需求與客戶溝通</li>
+                <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-berry"></i> <strong>研發 / 樣品房：</strong> 技術與打樣可行性</li>
+                <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-berry"></i> <strong>生管 / 資材：</strong> 產能排程與物料追蹤</li>
+                <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-berry"></i> <strong>品管部：</strong> 首件快速檢驗與合格判定</li>
+              </ul>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/10 text-[11px] text-gold-light">
+              授權代表即時決策，打破部門藩籬
+            </div>
+          </div>
+
+          <!-- Right blocks: Rhythm and Tasks -->
+          <div class="col-span-7 space-y-4 flex flex-col justify-between">
+            <div class="glass-card rounded-2xl p-5 border-l-4 border-berry">
+              <h4 class="text-sm font-bold text-charcoal flex items-center gap-2 mb-1">
+                <i class="fa-regular fa-clock text-berry"></i> 會議頻率與型態
+              </h4>
+              <p class="text-xs text-charcoal-muted">
+                每週一晨會（30 分鐘整體盤點） + 每日 10 分鐘 站立排程確認，高度敏捷應變。
+              </p>
+            </div>
+
+            <div class="glass-card rounded-2xl p-5 border-l-4 border-gold">
+              <h4 class="text-sm font-bold text-charcoal flex items-center gap-2 mb-2">
+                <i class="fa-solid fa-list-check text-gold-dark"></i> 戰情會議三大任務
+              </h4>
+              <div class="grid grid-cols-3 gap-2 text-xs text-charcoal font-medium">
+                <div class="bg-mist p-2 rounded text-center border border-mist-border">1. 檢視 Critical Path 進度</div>
+                <div class="bg-mist p-2 rounded text-center border border-mist-border">2. 盤點 14 天內料件到位</div>
+                <div class="bg-mist p-2 rounded text-center border border-mist-border">3. 現場決策異常件處置</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-xs text-charcoal-light flex justify-between items-center border-t border-mist-border pt-3">
+          <span>年底客製化訂單與樣品交期整合計畫</span>
+          <span>Slide 06</span>
+        </div>
+      </div>
+
+      <!-- SLIDE 7: Tracking & Early Warning -->
+      <div class="slide-page p-8 md:p-12 flex-col justify-between" id="slide-7">
+        <!-- Header -->
+        <div class="flex items-center justify-between border-b border-mist-border pb-4">
+          <div>
+            <span class="text-xs font-bold text-gold-dark uppercase tracking-wider">Tracking & Early Warning</span>
+            <h2 class="text-2xl md:text-3xl font-extrabold text-charcoal flex items-center gap-3">
+              <i class="fa-solid fa-stopwatch text-gold"></i>
+              六大節點追蹤與三色燈號管控
+            </h2>
+          </div>
+          <span class="text-xs text-charcoal-muted">預警機制</span>
+        </div>
+
+        <div class="space-y-4 my-auto">
+          <!-- 6 Nodes bar -->
+          <div class="bg-white p-4 rounded-2xl border border-mist-border shadow-sm">
+            <span class="text-xs font-bold text-berry mb-2 block">全流程六大關鍵追蹤節點：</span>
+            <div class="grid grid-cols-6 gap-2 text-center text-xs font-bold text-charcoal">
+              <div class="bg-mist p-2.5 rounded-lg border border-mist-border">1. 需求確認</div>
+              <div class="bg-mist p-2.5 rounded-lg border border-mist-border">2. 料件到位</div>
+              <div class="bg-mist p-2.5 rounded-lg border border-mist-border">3. 樣品打樣</div>
+              <div class="bg-mist p-2.5 rounded-lg border border-mist-border">4. 品質檢驗</div>
+              <div class="bg-mist p-2.5 rounded-lg border border-mist-border">5. 客戶確認</div>
+              <div class="bg-mist p-2.5 rounded-lg border border-mist-border">6. 轉量產排程</div>
+            </div>
+          </div>
+
+          <!-- 3 Color lights -->
+          <div class="grid grid-cols-3 gap-4">
+            <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4">
+              <div class="flex items-center gap-2 font-bold text-emerald-800 text-sm mb-1">
+                <span class="w-3 h-3 rounded-full bg-emerald-500"></span> 🟢 綠燈：進度正常
+              </div>
+              <p class="text-xs text-emerald-900/80">各節點皆按計畫時間節奏進行，無延遲風險。</p>
+            </div>
+
+            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+              <div class="flex items-center gap-2 font-bold text-amber-800 text-sm mb-1">
+                <span class="w-3 h-3 rounded-full bg-amber-500"></span> 🟡 黃燈：延遲 &lt; 2 天
+              </div>
+              <p class="text-xs text-amber-900/80">觸發內部微調預警，權責部門主動介入排解。</p>
+            </div>
+
+            <div class="bg-rose-50 border border-rose-200 rounded-2xl p-4">
+              <div class="flex items-center gap-2 font-bold text-rose-800 text-sm mb-1">
+                <span class="w-3 h-3 rounded-full bg-rose-500"></span> 🔴 紅燈：延遲 &gt; 2 天
+              </div>
+              <p class="text-xs text-rose-900/80">衝擊終端交期，立即提報戰情會緊急插隊調度。</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-xs text-charcoal-light flex justify-between items-center border-t border-mist-border pt-3">
+          <span>年底客製化訂單與樣品交期整合計畫</span>
+          <span>Slide 07</span>
+        </div>
+      </div>
+
+      <!-- SLIDE 8: Roles & Responsibilities (Bento Grid layout requested) -->
+      <div class="slide-page p-8 md:p-12 flex-col justify-between" id="slide-8">
+        <!-- Header -->
+        <div class="flex items-center justify-between border-b border-mist-border pb-4">
+          <div>
+            <span class="text-xs font-bold text-berry uppercase tracking-wider">Roles & Responsibilities</span>
+            <h2 class="text-2xl md:text-3xl font-extrabold text-charcoal flex items-center gap-3">
+              <i class="fa-solid fa-sitemap text-berry"></i>
+              跨部門任務權責分工 (Bento Layout)
+            </h2>
+          </div>
+          <span class="text-xs text-charcoal-muted">便當盒矩陣版型</span>
+        </div>
+
+        <!-- Bento Grid RACI Matrix Layout -->
+        <div class="grid grid-cols-2 gap-5 my-auto">
+          <!-- Bento Card 1: 業務部 -->
+          <div class="glass-card rounded-2xl p-5 border-l-4 border-berry flex gap-4 items-start shadow-sm hover:shadow-md transition">
+            <div class="w-12 h-12 rounded-xl bg-berry/10 text-berry flex items-center justify-center font-bold text-xl flex-shrink-0">
+              <i class="fa-solid fa-briefcase"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-charcoal mb-1">業務部 (Sales & Account)</h3>
+              <p class="text-xs text-charcoal-muted leading-relaxed">
+                負責客戶需求收集、初級 Class 分級審查提報、期待管理與交期異動之對外主動溝通。
+              </p>
+            </div>
+          </div>
+
+          <!-- Bento Card 2: 研發 / 樣品房 -->
+          <div class="glass-card rounded-2xl p-5 border-l-4 border-gold flex gap-4 items-start shadow-sm hover:shadow-md transition">
+            <div class="w-12 h-12 rounded-xl bg-gold/10 text-gold-dark flex items-center justify-center font-bold text-xl flex-shrink-0">
+              <i class="fa-solid fa-flask"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-charcoal mb-1">研發 / 樣品房 (R&D / Sample Lab)</h3>
+              <p class="text-xs text-charcoal-muted leading-relaxed">
+                負責 Class B/C 技術可行性評估、模具圖面確認、樣品試作打樣與技術卡關克服。
+              </p>
+            </div>
+          </div>
+
+          <!-- Bento Card 3: 生管 / 資材部 -->
+          <div class="glass-card rounded-2xl p-5 border-l-4 border-charcoal flex gap-4 items-start shadow-sm hover:shadow-md transition">
+            <div class="w-12 h-12 rounded-xl bg-charcoal/10 text-charcoal flex items-center justify-center font-bold text-xl flex-shrink-0">
+              <i class="fa-solid fa-boxes-stacked"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-charcoal mb-1">生管 / 資材部 (PMC & Logistics)</h3>
+              <p class="text-xs text-charcoal-muted leading-relaxed">
+                負責長交期客製料件追蹤、產線容量動態排程及甘特圖預警看板之每日維護。
+              </p>
+            </div>
+          </div>
+
+          <!-- Bento Card 4: 品管部 -->
+          <div class="glass-card rounded-2xl p-5 border-l-4 border-emerald-600 flex gap-4 items-start shadow-sm hover:shadow-md transition">
+            <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xl flex-shrink-0">
+              <i class="fa-solid fa-clipboard-check"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-charcoal mb-1">品管部 (Quality Control)</h3>
+              <p class="text-xs text-charcoal-muted leading-relaxed">
+                負責樣品與客製化首件產品之品質快速檢驗、品質判定與合格確認證明發行。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-xs text-charcoal-light flex justify-between items-center border-t border-mist-border pt-3">
+          <span>年底客製化訂單與樣品交期整合計畫</span>
+          <span>Slide 08</span>
+        </div>
+      </div>
+
+      <!-- SLIDE 9: Implementation Roadmap -->
+      <div class="slide-page p-8 md:p-12 flex-col justify-between" id="slide-9">
+        <!-- Header -->
+        <div class="flex items-center justify-between border-b border-mist-border pb-4">
+          <div>
+            <span class="text-xs font-bold text-gold-dark uppercase tracking-wider">Implementation Roadmap</span>
+            <h2 class="text-2xl md:text-3xl font-extrabold text-charcoal flex items-center gap-3">
+              <i class="fa-solid fa-timeline text-gold"></i>
+              三階段推動時程規劃
+            </h2>
+          </div>
+          <span class="text-xs text-charcoal-muted">推動里程碑</span>
+        </div>
+
+        <!-- Timeline 3 Stages -->
+        <div class="grid grid-cols-3 gap-6 my-auto">
+          <div class="glass-card rounded-2xl p-6 border-t-4 border-berry flex flex-col justify-between">
+            <div class="space-y-3">
+              <span class="text-xs font-bold text-berry uppercase tracking-wider">Phase 1 ‧ 第 1 週</span>
+              <h3 class="text-lg font-bold text-charcoal">一、準備期 (Setup)</h3>
+              <ul class="text-xs text-charcoal-muted space-y-2 list-disc pl-4">
+                <li>確立 Class A/B/C 審核機制與表單</li>
+                <li>完成長交期物料清單全面盤點</li>
+                <li>對齊各部門主管對 SOP 之權責共識</li>
+              </ul>
+            </div>
+            <div class="mt-4 pt-2 border-t border-mist-border text-[11px] font-bold text-berry">
+              里程碑：標準 SOP 及表單上線
+            </div>
+          </div>
+
+          <div class="glass-card rounded-2xl p-6 border-t-4 border-gold flex flex-col justify-between">
+            <div class="space-y-3">
+              <span class="text-xs font-bold text-gold-dark uppercase tracking-wider">Phase 2 ‧ 第 2 - 3 週</span>
+              <h3 class="text-lg font-bold text-charcoal">二、試執行期 (Pilot)</h3>
+              <ul class="text-xs text-charcoal-muted space-y-2 list-disc pl-4">
+                <li>正式啟動每週跨部門戰情會報</li>
+                <li>全面導入視覺化動態追蹤看板</li>
+                <li>實施插單評估矩陣實際試算與校正</li>
+              </ul>
+            </div>
+            <div class="mt-4 pt-2 border-t border-mist-border text-[11px] font-bold text-gold-dark">
+              里程碑：戰情會議運作暢通
+            </div>
+          </div>
+
+          <div class="glass-card rounded-2xl p-6 border-t-4 border-charcoal flex flex-col justify-between">
+            <div class="space-y-3">
+              <span class="text-xs font-bold text-charcoal-muted uppercase tracking-wider">Phase 3 ‧ 第 4 - 8 週</span>
+              <h3 class="text-lg font-bold text-charcoal">三、衝刺與複盤 (Sprint)</h3>
+              <ul class="text-xs text-charcoal-muted space-y-2 list-disc pl-4">
+                <li>每日 10 分鐘站立會精準追蹤進度</li>
+                <li>即時彈性調配樣品與產線生產資源</li>
+                <li>年終數據結算與 SOP 制度化歸檔</li>
+              </ul>
+            </div>
+            <div class="mt-4 pt-2 border-t border-mist-border text-[11px] font-bold text-charcoal">
+              里程碑：關鍵訂單 100% 準時交付
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-xs text-charcoal-light flex justify-between items-center border-t border-mist-border pt-3">
+          <span>年底客製化訂單與樣品交期整合計畫</span>
+          <span>Slide 09</span>
+        </div>
+      </div>
+
+      <!-- SLIDE 10: Call to Action / Next Steps -->
+      <div class="slide-page p-8 md:p-12 flex-col justify-between bg-gradient-to-br from-[#230813] via-[#38061A] to-[#1a1215] text-white" id="slide-10">
+        <div class="flex items-center justify-between">
+          <span class="px-3 py-1 rounded-full bg-gold/20 border border-gold/40 text-gold font-medium text-xs tracking-wider">
+            Call to Action / 高層決策請求
+          </span>
+          <span class="text-xs text-mist/60">Slide 10</span>
+        </div>
+
+        <div class="my-auto space-y-6 max-w-4xl">
+          <h2 class="text-3xl font-extrabold text-white">
+            推動本計畫需高層支援之<span class="text-gold">決策事項</span>
+          </h2>
+
+          <div class="grid grid-cols-2 gap-6 pt-2">
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-3">
+              <div class="text-gold font-bold text-lg flex items-center gap-2">
+                <i class="fa-solid fa-stamp"></i> 1. 授權核定
+              </div>
+              <p class="text-mist/80 text-sm leading-relaxed">
+                請總經理核定「客製化插單計分矩陣」標準，並授權戰情小組具備跨部門資源優先調度之權限。
+              </p>
+            </div>
+
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-3">
+              <div class="text-gold font-bold text-lg flex items-center gap-2">
+                <i class="fa-solid fa-users"></i> 2. 人員派員
+              </div>
+              <p class="text-mist/80 text-sm leading-relaxed">
+                指示業務、研發、生管與品管主管，於下週起指派具決策權之代表出席每週交期戰情會議。
+              </p>
+            </div>
+          </div>
+
+          <div class="text-center pt-6">
+            <p class="text-xl font-bold text-gold">感謝聆聽，請惠予指導與決策！</p>
+          </div>
+        </div>
+
+        <div class="pt-6 border-t border-white/10 flex items-center justify-between text-xs text-mist/60">
+          <div>年底客製化訂單與樣品交期整合計畫</div>
+          <div>Q&amp;A 交流時間</div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    // Slide list definition
+    const slides = [
+      { id: 1, title: '01. 封面與主題', icon: 'fa-house' },
+      { id: 2, title: '02. 年底三大痛點', icon: 'fa-triangle-exclamation' },
+      { id: 3, title: '03. 核心預期目標', icon: 'fa-chart-line' },
+      { id: 4, title: '04. 三級過濾機制', icon: 'fa-filter' },
+      { id: 5, title: '05. 插單評估矩陣', icon: 'fa-calculator' },
+      { id: 6, title: '06. 戰情小組運作', icon: 'fa-people-roof' },
+      { id: 7, title: '07. 追蹤與預警燈號', icon: 'fa-stopwatch' },
+      { id: 8, title: '08. 任務權責分工', icon: 'fa-sitemap' },
+      { id: 9, title: '09. 推動時程規劃', icon: 'fa-timeline' },
+      { id: 10, title: '10. 高層決策請求', icon: 'fa-stamp' }
+    ];
+
+    let currentSlide = 1;
+
+    // Initialize Navigation
+    function initNavigation() {
+      const navList = document.getElementById('nav-list');
+      navList.innerHTML = '';
+
+      slides.forEach((slide) => {
+        const btn = document.createElement('button');
+        btn.className = `nav-item w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-medium transition flex items-center justify-between cursor-pointer text-mist/70 hover:bg-white/5 hover:text-white ${slide.id === currentSlide ? 'active' : ''}`;
+        btn.onclick = () => goToSlide(slide.id);
+        
+        btn.innerHTML = `
+          <div class="flex items-center space-x-2.5 truncate">
+            <i class="fa-solid ${slide.icon} w-4 text-center"></i>
+            <span class="truncate">${slide.title}</span>
+          </div>
+          <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
+        `;
+        navList.appendChild(btn);
+      });
+
+      updateSlideDisplay();
+    }
+
+    // Go to specific slide
+    function goToSlide(slideId) {
+      if (slideId < 1 || slideId > slides.length) return;
+      
+      // Hide current slide
+      const currentEl = document.getElementById(`slide-${currentSlide}`);
+      if (currentEl) {
+        currentEl.classList.remove('active');
+      }
+
+      currentSlide = slideId;
+
+      // Show new slide
+      const newEl = document.getElementById(`slide-${currentSlide}`);
+      if (newEl) {
+        newEl.classList.add('active');
+      }
+
+      // Update sidebar nav highlighting
+      const navButtons = document.querySelectorAll('.nav-item');
+      navButtons.forEach((btn, idx) => {
+        if (idx + 1 === currentSlide) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      updateSlideDisplay();
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        goToSlide(currentSlide - 1);
+      }
+    }
+
+    function nextSlide() {
+      if (currentSlide < slides.length) {
+        goToSlide(currentSlide + 1);
+      }
+    }
+
+    function updateSlideDisplay() {
+      document.getElementById('slide-indicator').innerText = `${currentSlide} / ${slides.length}`;
+      document.getElementById('prev-btn').disabled = (currentSlide === 1);
+      document.getElementById('next-btn').disabled = (currentSlide === slides.length);
+    }
+
+    // Keyboard Arrow Keys Control
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'Space') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        prevSlide();
+      }
+    });
+
+    // Run Initialization
+    window.onload = function() {
+      initNavigation();
+    };
+  </script>
+</body>
+</html>
